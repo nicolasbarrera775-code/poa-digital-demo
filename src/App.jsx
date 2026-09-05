@@ -8,6 +8,8 @@ import {
   Layers, ScrollText, BadgeCheck, ExternalLink,
   Scale, PawPrint, ClipboardCheck, Info
 } from "lucide-react";
+import ArbolGenealogico, { damianData } from './ArbolGenealogico';
+import { generarPedigreePDF } from './generarPedigreePDF';
 
 /* =========================================================================
    POA DIGITAL — DEMO
@@ -67,7 +69,7 @@ const PERROS = {
   madre1: { id: "madre1", poa: "POA 12002", nombre: "FRIDA VON EXAMPLE", sexo: "Hembra", nacimiento: "2020-02-14", pelo: "Corto", color: "Negro y fuego", criadorId: "c1", propietarioId: "p1", microchip: "DEMO-939000111112", tatuaje: "DEMO-XA0002", estado: "Activo", padreId: "abuelo_m1", madreId: "abuela_m1", seleccion: { clase: "Clase I BH*", resultado: "Muy Bueno" }, cadera: "Casi Normal", codo: "Normal", dentario: "Aprobado", trabajo: [{ tipo: "BH", resultado: "Aprobado", fecha: "2021-06-01" }] },
 
   max: {
-    id: "max", poa: "POA 45872", nombre: "MAX VON EXAMPLE", sexo: "Macho", nacimiento: "2024-03-14",
+    id: "max", poa: "POA 400683", nombre: "DAMIÁN VON DER GRUBEM LAND", sexo: "Macho", nacimiento: "2024-03-14",
     pelo: "Corto", color: "Negro y fuego", señas: "Sin señas particulares",
     criadorId: "c1", propietarioId: "p2", propietarioAnteriorId: "p1",
     microchip: "DEMO-939000123456", tatuaje: "DEMO-ABC123", estado: "Activo",
@@ -273,7 +275,7 @@ const TRAMITES = {
 };
 
 const DOCUMENTOS = [
-  { id: "d1", tipo: "Pedigree", nombre: "Pedigree — MAX VON EXAMPLE (POA 45872)", relacion: { perroId: "max" }, estado: "Validado", fecha: "2024-05-14" },
+  { id: "d1", tipo: "Pedigree", nombre: "Pedigree — MAX VON EXAMPLE (POA 400683)", relacion: { perroId: "max" }, estado: "Validado", fecha: "2024-05-14" },
   { id: "d2", tipo: "Informe de transferencia", nombre: "Informe de Transferencia de Dominio — TR-2026-00124", relacion: { tramiteId: "TR-2026-00124", perroId: "max" }, estado: "Pendiente", fecha: "2026-01-22" },
   { id: "d3", tipo: "Solicitud de socio", nombre: "Solicitud de Socio — María Example", relacion: { personaId: "p2" }, estado: "Validado", fecha: "2023-08-01" },
   { id: "d4", tipo: "Certificado", nombre: "Certificado de Diagnóstico DCF/Codo — MAX VON EXAMPLE", relacion: { perroId: "max", tramiteId: "TR-2026-00140" }, estado: "Observado", fecha: "2025-11-02" },
@@ -295,10 +297,10 @@ const ROLES = [
 ];
 
 const AUDITORIA = [
-  { id: "a1", usuario: "secretaria.demo", accion: "Actualizó propietario", entidad: "Ejemplar POA 45872", fecha: "2026-01-24 10:12", anterior: "Juan Example", nuevo: "María Example" },
-  { id: "a2", usuario: "veterinario.demo", accion: "Cargó diagnóstico", entidad: "Ejemplar POA 45872 — Cadera", fecha: "2025-11-02 09:03", anterior: "—", nuevo: "Normal" },
+  { id: "a1", usuario: "secretaria.demo", accion: "Actualizó propietario", entidad: "Ejemplar POA 400683", fecha: "2026-01-24 10:12", anterior: "Juan Example", nuevo: "María Example" },
+  { id: "a2", usuario: "veterinario.demo", accion: "Cargó diagnóstico", entidad: "Ejemplar POA 400683 — Cadera", fecha: "2025-11-02 09:03", anterior: "—", nuevo: "Normal" },
   { id: "a3", usuario: "admin.poa", accion: "Publicó nuevo período de aranceles", entidad: "Aranceles — vigente 01/09/2026", fecha: "2026-08-28 16:40", anterior: "v2025-11", nuevo: "v2026-09" },
-  { id: "a4", usuario: "juez.demo", accion: "Cargó resultado de Selección", entidad: "Ejemplar POA 45872", fecha: "2026-02-08 12:00", anterior: "—", nuevo: "Clase I / Muy Bueno" },
+  { id: "a4", usuario: "juez.demo", accion: "Cargó resultado de Selección", entidad: "Ejemplar POA 400683", fecha: "2026-02-08 12:00", anterior: "—", nuevo: "Clase I / Muy Bueno" },
 ];
 
 /* ------------------------------ HELPERS ---------------------------------- */
@@ -774,7 +776,7 @@ function Dashboard({ go }) {
         <div className="poa-card p-4 lg:col-span-1">
           <SectionTitle icon={History}>Actividad reciente</SectionTitle>
           <div className="divide-y poa-hairline">
-            <ActividadItem icon={ClipboardList} text="Nueva transferencia recibida — MAX VON EXAMPLE (POA 45872)" time="Hace 2 días" tone="warn" />
+            <ActividadItem icon={ClipboardList} text="Nueva transferencia recibida — MAX VON EXAMPLE (POA 400683)" time="Hace 2 días" tone="warn" />
             <ActividadItem icon={Stethoscope} text="Nuevo diagnóstico cargado — Cadera / Codo, MAX VON EXAMPLE" time="Hace 3 días" tone="info" />
             <ActividadItem icon={Baby} text="Nueva camada registrada — CAM-2026-001 (Von Example)" time="Hace 1 semana" tone="ok" />
             <ActividadItem icon={Users} text="Nuevo socio aprobado — Ana Demo (Cadete)" time="Hace 2 semanas" tone="ok" />
@@ -1473,7 +1475,7 @@ function TransferenciaForm({ go }) {
   return (
     <div className="p-4 md:p-6 max-w-[800px] mx-auto">
       <h1 className="poa-serif text-2xl text-[var(--ink)] mb-1">Cambio de Titularidad</h1>
-      <p className="text-sm text-[var(--slate3)] mb-4">Formulario DEMO — MAX VON EXAMPLE (POA 45872) <DemoPill className="ml-1 align-middle" /></p>
+      <p className="text-sm text-[var(--slate3)] mb-4">Formulario DEMO — MAX VON EXAMPLE (POA 400683) <DemoPill className="ml-1 align-middle" /></p>
       <div className="poa-card p-5 space-y-4">
         <div className="p-3 rounded border poa-hairline text-xs text-[var(--slate2)] flex items-start gap-2" style={{ background: "var(--parchment)" }}>
           <AlertTriangle size={14} className="shrink-0 mt-0.5 text-[var(--brass)]" />
