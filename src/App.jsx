@@ -551,6 +551,8 @@ function PedigreeTree({ perroId, onOpen }) {
       <div className="mt-4 flex items-center justify-between">
         <p className="text-xs text-[var(--slate3)]">Genealogía visible: 2 generaciones. La estructura admite ampliarse a más generaciones cuando se conecte el registro histórico completo.</p>
         <button className="poa-focus text-xs font-medium px-3 py-1.5 rounded border poa-hairline text-[var(--ink)] hover:border-[var(--oxblood)] shrink-0 ml-3">Ver pedigree completo</button>
+        <button onClick={() => generarPedigreePDF(p, padre, madre, abueloPP, perro(padre?.madreId), perro(madre?.padreId), abueloMM)} className="poa-focus text-xs font-medium px-3 py-1.5 rounded-md border" style={{marginLeft: '8px'}}>          Descargar PDF
+        </button>
       </div>
     </div>
   );

@@ -1,7 +1,7 @@
 import { jsPDF } from "jspdf";
 import QRCode from "qrcode";
 
-export async function generarPedigreePDF(ejemplar) {
+export async function generarPedigreePDF(ejemplar, padre, madre, abueloPP, abueloPM, abueloMP, abueloMM) {
   const doc = new jsPDF({ unit: "mm", format: "a4" });
 
   doc.setFillColor(20, 40, 30);
@@ -19,16 +19,16 @@ export async function generarPedigreePDF(ejemplar) {
   let y = 42;
   doc.setFontSize(14);
   doc.setFont("helvetica", "bold");
-  doc.text(ejemplar.nombre, 15, y);
+  doc.text(ejemplar.nombre || "Sin nombre", 15, y);
 
   y += 8;
   doc.setFontSize(10);
   doc.setFont("helvetica", "normal");
-  doc.text(`POA: ${ejemplar.poa}`, 15, y);
+  doc.text(`POA: ${ejemplar.poa || "-"}`, 15, y);
   y += 6;
-  doc.text(`Fecha de nacimiento: ${ejemplar.nacimiento}`, 15, y);
+  doc.text(`Fecha de nacimiento: ${ejemplar.nacimiento || "-"}`, 15, y);
   y += 6;
-  doc.text(`Criador: ${ejemplar.criador}`, 15, y);
+  doc.text(`Criador ID: ${ejemplar.criadorId || "-"}`, 15, y);
 
   y += 12;
   doc.setFont("helvetica", "bold");
@@ -37,20 +37,20 @@ export async function generarPedigreePDF(ejemplar) {
   y += 8;
 
   doc.setFontSize(9);
-  doc.text(`Padre: ${ejemplar.padre.nombre}`, 15, y);
+  doc.text(`Padre: ${padre?.nombre || "No disponible"}`, 15, y);
   y += 5;
-  doc.text(`  Abuelo paterno: ${ejemplar.padre.padre.nombre}`, 20, y);
+  doc.text(`  Abuelo paterno: ${abueloPP?.nombre || "No disponible"}`, 20, y);
   y += 5;
-  doc.text(`  Abuela paterna: ${ejemplar.padre.madre.nombre}`, 20, y);
+  doc.text(`  Abuela paterna: ${abueloPM?.nombre || "No disponible"}`, 20, y);
   y += 8;
 
-  doc.text(`Madre: ${ejemplar.madre.nombre}`, 15, y);
+  doc.text(`Madre: ${madre?.nombre || "No disponible"}`, 15, y);
   y += 5;
-  doc.text(`  Abuelo materno: ${ejemplar.madre.padre.nombre}`, 20, y);
+  doc.text(`  Abuelo materno: ${abueloMP?.nombre || "No disponible"}`, 20, y);
   y += 5;
-  doc.text(`  Abuela materna: ${ejemplar.madre.madre.nombre}`, 20, y);
+  doc.text(`  Abuela materna: ${abueloMM?.nombre || "No disponible"}`, 20, y);
 
-  const urlVerificacion = `https://tu-plataforma.com/verificar/${ejemplar.poa}`;
+  const urlVerificacion = `https://tu-plataforma.com/verificar/${ejemplar.poa || ""}`;
   const qrDataUrl = await QRCode.toDataURL(urlVerificacion, { margin: 1, width: 200 });
   doc.addImage(qrDataUrl, "PNG", 160, 40, 35, 35);
   doc.setFontSize(7);
@@ -64,5 +64,5 @@ export async function generarPedigreePDF(ejemplar) {
     285
   );
 
-  doc.save(`Pedigree_${ejemplar.nombre.replace(/\s+/g, "_")}.pdf`);
+  doc.save(`Pedigree_${(ejemplar.nombre || "ejemplar").replace(/\s+/g, "_")}.pdf`);
 }
