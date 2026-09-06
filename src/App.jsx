@@ -867,6 +867,15 @@ function Dashboard({ go }) {
           </div>
         </div>
       </div>
+      <div className="poa-card p-4 md:p-6 mt-6" style={{borderStyle: 'dashed'}}>
+        <SectionTitle icon={ScrollText}>Próximos pasos — Visión 2027</SectionTitle>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
+          <div className="flex items-center gap-2 text-sm"><span>🐕</span> Reconocimiento automático de fotos de pedigrees físicos (IA)</div>
+          <div className="flex items-center gap-2 text-sm"><span>🌳</span> Construcción automática del árbol genealógico</div>
+          <div className="flex items-center gap-2 text-sm"><span>🔗</span> Navegación clickeable entre ancestros</div>
+          <div className="flex items-center gap-2 text-sm"><span>📊</span> Estadísticas de consanguinidad en tiempo real</div>
+        </div>
+      </div>
     </div>
   );
 }
