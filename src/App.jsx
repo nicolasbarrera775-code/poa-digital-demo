@@ -528,6 +528,7 @@ function PedigreeCard({ id, onOpen, role }) {
 }
 
 function PedigreeTree({ perroId, onOpen }) {
+  const [solicitado, setSolicitado] = useState(false);
   const p = perro(perroId);
   if (!p) return <Empty title="Ejemplar no encontrado" />;
   const padre = perro(p.padreId), madre = perro(p.madreId);
@@ -552,8 +553,14 @@ function PedigreeTree({ perroId, onOpen }) {
       </div>
       <div className="mt-4 flex items-center justify-between">
         <p className="text-xs text-[var(--slate3)]">Genealogía visible: 2 generaciones. La estructura admite ampliarse a más generaciones cuando se conecte el registro histórico completo.</p>
-        <button className="poa-focus text-xs font-medium px-3 py-1.5 rounded border poa-hairline text-[var(--ink)] hover:border-[var(--oxblood)] shrink-0 ml-3">Ver pedigree completo</button>
-        <button onClick={() => generarPedigreePDF(p, padre, madre, abueloPP, perro(padre?.madreId), perro(madre?.padreId), abueloMM)} className="poa-focus text-xs font-medium px-3 py-1.5 rounded-md border" style={{marginLeft: '8px'}}>          Descargar PDF
+        {solicitado ? (
+  <p className="text-xs" style={{color:'#16a34a'}}>✓ Solicitud enviada — nos pondremos en contacto por correo</p>
+) : (
+  <button onClick={() => setSolicitado(true)} className="poa-focus text-xs font-medium px-3 py-1.5 rounded-md border">
+    Solicitar Certificado de Origen físico
+  </button>
+)}
+        <button onClick={() => generarPedigreePDF(p, padre, madre, abueloPP, perro(padre?.madreId), perro(madre?.padreId), abueloMM)} className="poa-focus text-xs font-medium px-3 py-1.5 rounded-md border" style={{marginLeft: '8px'}}>          Descargar Pedigree Digital (PDF)
         </button>
       </div>
     </div>
