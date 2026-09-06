@@ -53,6 +53,19 @@ const PERSONAS = {
   p5: { id: "p5", nombre: "Lucía Demo", dni: "22.888.999", domicilio: "Diagonal 3", localidad: "Córdoba", provincia: "Córdoba", cp: "5000", pais: "Argentina", telefono: "351-000-0005", email: "lucia.demo@demo.poa", esSocio: false, rol: "Juez" },
   p6: { id: "p6", nombre: "Diego Demo", dni: "27.101.202", domicilio: "Cmte. Martín Quenón 825", localidad: "Río Cuarto", provincia: "Córdoba", cp: "5800", pais: "Argentina", telefono: "358-484-9569", email: "diego.demo@demo.poa", esSocio: false, rol: "Veterinario radiólogo" },
 };
+// Resultados de exposiciones — historial, nunca se sobrescribe
+const DOG_SHOW_RESULTS = [
+  { id: "r1", dogId: "max", rating: "VA", placement: 1, year: 2026, eventDate: "2026-05-10", country: "Argentina", city: "Mendoza", eventName: "Sieger Argentina 2026", eventType: "Sieger", judge: "Hans Müller", judgeAuthorized: true, evidence: null, notes: "", isDemo: true },
+  { id: "r2", dogId: "max", rating: "VA", placement: 2, year: 2024, eventDate: "2024-04-22", country: "Argentina", city: "Buenos Aires", eventName: "Sieger Argentina 2024", eventType: "Sieger", judge: "Carlos Peretti", judgeAuthorized: true, evidence: null, notes: "", isDemo: true },
+  { id: "r3", dogId: "max", rating: "V", placement: 1, year: 2023, eventDate: "2023-09-15", country: "Chile", city: "Santiago", eventName: "Regional Chile 2023", eventType: "Regional", judge: "Marcela Ibáñez", judgeAuthorized: true, evidence: null, notes: "", isDemo: true },
+  { id: "r4", dogId: "padre1", rating: "VA", placement: 1, year: 2022, eventDate: "2022-06-11", country: "Argentina", city: "Córdoba", eventName: "Sieger Argentina 2022", eventType: "Sieger", judge: "Hans Müller", judgeAuthorized: true, evidence: null, notes: "", isDemo: true },
+];
+
+function resultadosPerro(dogId) {
+  return DOG_SHOW_RESULTS
+    .filter(r => r.dogId === dogId)
+    .sort((a, b) => b.year - a.year);
+}
 
 const CRIADEROS = {
   c1: { id: "c1", afijo: "Von Example", titularId: "p1", registroNacional: "AF-1988", registroInternacional: "INT-3321", estado: "Activo" },
@@ -530,6 +543,7 @@ function PedigreeCard({ id, onOpen, role }) {
 function PedigreeTree({ perroId, onOpen }) {
   const [solicitado, setSolicitado] = useState(false);
   const p = perro(perroId);
+  const resultados = resultadosPerro(p.id);
   if (!p) return <Empty title="Ejemplar no encontrado" />;
   const padre = perro(p.padreId), madre = perro(p.madreId);
   const abueloPP = padre ? perro(padre.padreId) : null, abuelaPP = padre ? perro(padre.madreId) : null;
@@ -551,6 +565,28 @@ function PedigreeTree({ perroId, onOpen }) {
           <PedigreeCard id={madre?.madreId} onOpen={onOpen} role="Abuela materna" />
         </div>
       </div>
+              {resultados.length > 0 && (
+          <div className="mt-4">
+            <p className="text-xs text-[var(--slate3)] mb-1">Trayectoria en exposiciones</p>
+            <div className="flex flex-wrap gap-2">
+              {resultados.map(r => (
+                <details key={r.id} className="poa-card px-2 py-1 rounded-md text-xs cursor-pointer">
+                  <summary>
+                    🏆 {r.rating}{r.placement ? r.placement : ""} — {r.country} — {r.year}
+                    {r.isDemo && <span className="text-[9px] text-[var(--slate3)]"> (demo)</span>}
+                  </summary>
+                  <div className="mt-1 text-[11px] text-[var(--slate3)]">
+                    <div>Evento: {r.eventName}</div>
+                    <div>Fecha: {r.eventDate}</div>
+                    <div>Lugar: {r.city}, {r.country}</div>
+                    <div>Juez: {r.judge}{r.judgeAuthorized ? " (autorizado)" : ""}</div>
+                    {r.notes && <div>Obs: {r.notes}</div>}
+                  </div>
+                </details>
+              ))}
+            </div>
+          </div>
+        )}
       <div className="mt-4 flex items-center justify-between">
         <p className="text-xs text-[var(--slate3)]">Genealogía visible: 2 generaciones. La estructura admite ampliarse a más generaciones cuando se conecte el registro histórico completo.</p>
         {solicitado ? (
