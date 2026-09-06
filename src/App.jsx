@@ -10,6 +10,8 @@ import {
 } from "lucide-react";
 import ArbolGenealogico, { damianData } from './ArbolGenealogico';
 import { generarPedigreePDF } from './generarPedigreePDF';
+import { generarCertificadoTransferencia } from './generarCertificadoTransferencia';
+import { generarCertificadoCamada } from './generarCertificadoCamada';
 
 /* =========================================================================
    POA DIGITAL — DEMO
@@ -1252,11 +1254,24 @@ function CamadaFicha({ id, go }) {
   if (!cm) return <div className="p-6"><Empty title="Camada no encontrada" /></div>;
   const padre = perro(cm.padreId), madre = perro(cm.madreId);
   const cachorros = cm.cachorroIds.map(perro);
+const criadorInfo = criadero(cm.criadorId) || {};
   return (
     <div className="p-4 md:p-6 max-w-[900px] mx-auto">
       <div className="poa-card p-5 mb-4">
         <div className="flex items-center gap-2 flex-wrap mb-1"><Badge tone={cm.estado}>{cm.estado}</Badge><DemoPill /></div>
         <h1 className="poa-serif text-2xl text-[var(--ink)] poa-mono">{cm.codigo}</h1>
+        <button onClick={() => generarCertificadoCamada({
+  numeroCamada: cm.codigo,
+  criador: { nombre: criadorInfo.nombre || "-", afijo: criadorInfo.afijo || "-" },
+  padre: { nombre: padre?.nombre || "-", poa: padre?.poa || "-" },
+  madre: { nombre: madre?.nombre || "-", poa: madre?.poa || "-" },
+  fechaNacimiento: cm.fechaNacimiento,
+  cantidadMachos: cm.machos,
+  cantidadHembras: cm.hembras,
+  cachorros: cachorros.map(c => ({ nombre: c?.nombre || "-", sexo: c?.sexo || "-", color: c?.color || "-", poa: c?.poa || "-" })),
+})} className="poa-focus text-xs font-medium px-4 py-2 rounded-lg bg-[var(--brass)] text-white mt-2">
+  Descargar Certificado de Camada PDF
+</button>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-3">
           <Field label="Criador">{criadero(cm.criadorId)?.afijo}</Field>
           <Field label="Fecha de servicio">{fmtDate(cm.fechaServicio)}</Field>
@@ -1437,6 +1452,15 @@ function TramiteDetalle({ id, go }) {
 
 /* --------------------------- FORMULARIO DE TRANSFERENCIA --------------------- */
 
+const Input = ({ k, label, placeholder, form, errors, set }) => (
+    <div>
+      <label className="text-xs text-[var(--slate3)] mb-1 block">{label}</label>
+      <input value={form[k]} onChange={e => set(k, e.target.value)} placeholder={placeholder}
+        className={`w-full text-sm border rounded px-2.5 py-2 bg-white text-[var(--ink)] poa-focus ${errors[k] ? "border-[var(--red)]" : "poa-hairline"}`} />
+      {errors[k] && <div className="text-[11px] text-[var(--red)] mt-0.5">{errors[k]}</div>}
+    </div>
+  );
+
 function TransferenciaForm({ go }) {
   const [form, setForm] = useState({ nuevoPropietario: "", dni: "", domicilio: "", localidad: "", provincia: "", cp: "", pais: "Argentina", telefono: "", email: "", nroSocio: "", titularAnterior: "Juan Example", fechaEntrega: "", firma: false });
   const [errors, setErrors] = useState({});
@@ -1459,20 +1483,32 @@ function TransferenciaForm({ go }) {
           <CheckCircle2 size={32} className="mx-auto mb-3" style={{ color: "var(--green)" }} />
           <h2 className="poa-serif text-xl text-[var(--ink)] mb-1">Solicitud registrada (DEMO)</h2>
           <p className="text-sm text-[var(--slate3)] mb-4">Se generó un trámite de transferencia de ejemplo. En la plataforma real, esto crearía el registro en Trámites y notificaría a Secretaría.</p>
+          <button onClick={() => generarCertificadoTransferencia({
+  ejemplar: { nombre: "MAX VON EXAMPLE", poa: "400683" },
+  titularAnterior: { nombre: form.titularAnterior || "Juan Example", dni: "" },
+  nuevoTitular: {
+    nombre: form.nuevoPropietario,
+    dni: form.dni,
+    domicilio: form.domicilio,
+    localidad: form.localidad,
+    provincia: form.provincia,
+    cp: form.cp,
+    pais: form.pais,
+    telefono: form.telefono,
+    email: form.email,
+  },
+  fechaEntrega: form.fechaEntrega,
+  numeroTramite: "TR-2026-00124",
+})} className="poa-focus text-xs font-medium px-4 py-2 rounded-lg bg-[var(--brass)] text-white mb-3">
+  Descargar Certificado PDF
+</button>
           <button onClick={() => go({ module: "tramiteDetalle", id: "TR-2026-00124" })} className="poa-focus text-sm font-medium text-white px-4 py-2 rounded-md" style={{ background: "var(--oxblood)" }}>Ver trámite de ejemplo</button>
         </div>
       </div>
     );
   }
 
-  const Input = ({ k, label, placeholder }) => (
-    <div>
-      <label className="text-xs text-[var(--slate3)] mb-1 block">{label}</label>
-      <input value={form[k]} onChange={e => set(k, e.target.value)} placeholder={placeholder}
-        className={`w-full text-sm border rounded px-2.5 py-2 bg-white text-[var(--ink)] poa-focus ${errors[k] ? "border-[var(--red)]" : "poa-hairline"}`} />
-      {errors[k] && <div className="text-[11px] text-[var(--red)] mt-0.5">{errors[k]}</div>}
-    </div>
-  );
+  
 
   return (
     <div className="p-4 md:p-6 max-w-[800px] mx-auto">
@@ -1484,25 +1520,25 @@ function TransferenciaForm({ go }) {
           Los formularios oficiales deben presentarse completos, sin enmiendas ni tachaduras.
         </div>
         <div className="grid grid-cols-2 gap-4">
-          <Input k="nuevoPropietario" label="Nombre y apellido — nuevo propietario" />
-          <Input k="dni" label="D.N.I." />
+          <Input k="nuevoPropietario" label="Nombre y apellido — nuevo propietario" form={form} errors={errors} set={set} />
+          <Input k="dni" label="D.N.I." form={form} errors={errors} set={set} />
         </div>
         <div className="grid grid-cols-2 gap-4">
-          <Input k="domicilio" label="Domicilio" />
-          <Input k="localidad" label="Localidad" />
+          <Input k="domicilio" label="Domicilio" form={form} errors={errors} set={set} />
+          <Input k="localidad" label="Localidad" form={form} errors={errors} set={set} />
         </div>
         <div className="grid grid-cols-3 gap-4">
-          <Input k="provincia" label="Provincia" />
-          <Input k="cp" label="Código postal" />
-          <Input k="pais" label="País" />
+          <Input k="provincia" label="Provincia" form={form} errors={errors} set={set} />
+          <Input k="cp" label="Código postal" form={form} errors={errors} set={set} />
+          <Input k="pais" label="País" form={form} errors={errors} set={set} />
         </div>
         <div className="grid grid-cols-3 gap-4">
-          <Input k="telefono" label="Teléfono" />
-          <Input k="email" label="Email" />
-          <Input k="nroSocio" label="N.º de socio (si corresponde)" />
+          <Input k="telefono" label="Teléfono" form={form} errors={errors} set={set} />
+          <Input k="email" label="Email" form={form} errors={errors} set={set} />
+          <Input k="nroSocio" label="N.º de socio (si corresponde)" form={form} errors={errors} set={set} />
         </div>
         <div className="grid grid-cols-2 gap-4">
-          <Input k="titularAnterior" label="Titular anterior" />
+          <Input k="titularAnterior" label="Titular anterior" form={form} errors={errors} set={set} />
           <div>
             <label className="text-xs text-[var(--slate3)] mb-1 block">Fecha de entrega del ejemplar</label>
             <input type="date" value={form.fechaEntrega} onChange={e => set("fechaEntrega", e.target.value)} className={`w-full text-sm border rounded px-2.5 py-2 bg-white text-[var(--ink)] poa-focus ${errors.fechaEntrega ? "border-[var(--red)]" : "poa-hairline"}`} />
