@@ -1022,6 +1022,24 @@ function EjemplarFicha({ id, go, tab, setTab }) {
                   <Field label="Juez">{persona(p.seleccion.juezId)?.nombre}</Field>
                 </div>
               ) : <Empty icon={BadgeCheck} title="Sin resultado de Selección" />}
+                            <div className="poa-card p-4 mt-3">
+                <SectionTitle icon={BadgeCheck}>Habilitación como reproductor</SectionTitle>
+                <p className="text-xs text-[var(--slate3)] mb-3">
+                  Estos son los requisitos habituales del proceso de cría. No son obligatorios para usar la plataforma — quedan como referencia informativa.
+                </p>
+                {[
+                  "Placas de cadera y codo (sin displasia)",
+                  "Control dentario (≈15 meses)",
+                  "Apto de cría",
+                  "Selection (prueba de temperamento)",
+                  "BH / BH Plus (obediencia)",
+                ].map((req, i) => (
+                  <div key={i} className="flex items-center justify-between py-1.5 border-b last:border-0" style={{borderColor: 'var(--line)'}}>
+                    <span className="text-sm">{req}</span>
+                    <span className="text-xs px-2 py-0.5 rounded-full" style={{background: 'var(--chip)', color: 'var(--slate3)'}}>Pendiente</span>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
           {tab === "trabajo" && (
