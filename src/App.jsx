@@ -2048,9 +2048,7 @@ function PortalPublico({ go, id }) {
       <div className="max-w-[720px] mx-auto p-6 md:p-10">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: "var(--brass)" }}><PawPrint size={17} color="var(--ink)" /></div>
-            <div><div className="poa-serif text-white text-base leading-none">POA Digital</div><div className="text-[10px] text-white/50">Consulta de ejemplares</div></div>
-          </div>
+<img src="/logo-club.jpg" alt="Logo del club" className="w-9 h-9 rounded-full object-cover" />          </div>
           <button onClick={() => go("dashboard")} className="poa-focus text-xs text-white/60 hover:text-white flex items-center gap-1"><ArrowLeft size={12} /> Panel interno</button>
         </div>
 
